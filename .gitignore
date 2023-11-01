@@ -2,3 +2,6 @@ node_modules/
 ai1wm-backups/
 
 wp-config.php
+experiment.php
+
+.htaccess
