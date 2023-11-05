@@ -50,6 +50,7 @@ function university_features() {
     add_image_size('professorLandscape', 411, 260, array('left', 'top')); //411x260
     add_image_size('professorPortrait', 480, 650, true);
     add_image_size('pageBanner',1500, 350, true);
+    add_image_size('slideshowImage', 1900, 525, true);
     /* additional features
     */
     register_nav_menu('headerMenuLocation', 'Header Menu Location');

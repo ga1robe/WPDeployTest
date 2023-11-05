@@ -1,6 +1,8 @@
 node_modules/
 ai1wm-backups/
 
+wp-content/plugins/advanced-custom-fields/**
+
 #wp-config.php
 experiment.php
 

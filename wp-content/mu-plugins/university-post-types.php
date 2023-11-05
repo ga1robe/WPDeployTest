@@ -104,7 +104,7 @@ function university_post_types(){
             'all_items' => 'All Notes',
             'singular_name' => 'Note'
             )
-        ));
+    ));
     
     /*
     Like Post Type
@@ -121,7 +121,26 @@ function university_post_types(){
             'all_items' => 'All Likes',
             'singular_name' => 'Like'
             )
-        ));
+    ));
+        
+    /*
+    Homepage Slideshow Post Type
+    */
+    register_post_type('homepage-slideshow', [
+        'public' => false, /* not publicly visible */
+        'has_archive' => false,
+        'supports' => array('title'),
+        'show_in_rest' => true,
+        'show_ui' => true, /* to be visible in the admin panel */
+        'menu_icon' => 'dashicons-images-alt',
+        'labels' => [
+            'name' => 'Homepage-slideshow',
+            'add_new_item' => 'Add New Homepage-slide',
+            'edit_item' => 'Edit Homepage-slide',
+            'all_items' => 'All Homepage-slides',
+            'singular_name' => 'Homepage-slide'
+            ]
+    ]);
 }
 
 add_action('init', 'university_post_types');
