@@ -1,10 +1,12 @@
-i<?php
+<?php
 /*
 * Plugin Name: Our Test Plugin
 * Description: A truly amazing plugin.
 * Verstion: 1.0
 * Author: ga1robe
 * Author URI: http://kreatywne-media.pl/graphics-training/
+* Text Domain: wcp_domain
+* Domain Path: /languages
 */
 
 class WordCountAndTimePlugin {
@@ -12,10 +14,12 @@ class WordCountAndTimePlugin {
         add_action('admin_menu',array($this, 'adminPage'));
         add_action('admin_init', array($this, 'settings'));
         add_filter('the_content', array($this, 'ifWrap'));
+        add_action('init', array($this, 'languages'));
     }
 
     function adminPage(){
-        add_options_page("Word Count Settings", "Word Count", "manage_options", "word-count-settings-page", array($this, "ourHTML"));
+        // add_options_page("Word Count Settings", "Word Count", "manage_options", "word-count-settings-page", array($this, "ourHTML"));
+        add_options_page("Word Count Settings", esc_html__("Word Count", "wcp_domain"), "manage_options", "word-count-settings-page", array($this, "ourHTML"));
     }
 
     function settings(){
@@ -34,7 +38,7 @@ class WordCountAndTimePlugin {
         register_setting('word_count_plugin', 'wcp_charcount', array('sanitize_callback' => 'sanitize_text_field', 'default' => '1'));
         /* Read time */
         add_settings_field("wcp_readtime", "Read Time", array($this, 'checkboxHTML'), 'word-count-settings-page', 'wcp_first_section', array('theId' => 'wcp_readtime', "theTitle" => "Read Time"));
-        register_setting('word_count_plugin', 'wcp_readtime', array('sanitize_callback' => 'sanitize_text_field', 'default' => '1'));
+        register_setting('word_count_plugin', 'wcp_readtime', array('sanitize_callback' => 'sanitize_text_field', 'default' => '2'));
     }
 
     function ourHTML(){ ?>
@@ -94,19 +98,21 @@ class WordCountAndTimePlugin {
         if(get_option('wcp_wordcount', '1') == '1' OR get_option('wcp_readtime', '1') == '1')
             $wordCount = str_word_count(strip_tags($content));
         if(get_option('wcp_wordcount', '1') == '1')
-            $html .= '<p>' . "This post has " . $wordCount . " words.<br/>";
+            $html .= esc_html__("This post has", "wcp_domain"). ' ' . $wordCount . ' ' . esc_html__("words", "wcp_domain") . ".<br/>";
         if(get_option('wcp_charcount', '1') == '1') {
             $charCount = mb_strlen(strip_tags($content));
-            $html .= "This post has " . $charCount . " characters.<br/>";
+            $html .= esc_html__("This post has", "wcp_domain") . ' ' . $charCount . ' ' . esc_html__("characters", "wcp_domain") . ".<br/>";
         }
         if(get_option('wcp_readtime', '1') == '1'){
-            $html .= "This post will take about " . round($wordCount/255, 1) . " minute(s) to read.</br>";
+            $html .= esc_html__("This post will take about", "wcp_domain") . ' ' . round($wordCount/255, 1) . ' ' . esc_html__("minute(s) to read", "wcp_domain") . ".</br>";
         }
         $html .= '</p>';
         if(get_option('wcp_location', '0') == 0)
             return $html . $content;
         return $content . $html;
     }
+
+    function languages(){ load_plugin_textdomain('wcp_domain', false, dirname(plugin_basename(__FILE__)) . '/languages'); }
 }
 
 $wordCountAndTimePlugin = new WordCountAndTimePlugin();
