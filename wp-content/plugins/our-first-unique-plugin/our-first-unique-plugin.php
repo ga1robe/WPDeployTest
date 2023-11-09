@@ -11,6 +11,11 @@ class WordCountAndTimePlugin {
     function __construct() {
         add_action('admin_menu',array($this, 'adminPage'));
         add_action('admin_init', array($this, 'settings'));
+        add_filter('the_content', array($this, 'ifWrap'));
+    }
+
+    function adminPage(){
+        add_options_page("Word Count Settings", "Word Count", "manage_options", "word-count-settings-page", array($this, "ourHTML"));
     }
 
     function settings(){
@@ -30,10 +35,6 @@ class WordCountAndTimePlugin {
         /* Read time */
         add_settings_field("wcp_readtime", "Read Time", array($this, 'checkboxHTML'), 'word-count-settings-page', 'wcp_first_section', array('theId' => 'wcp_readtime', "theTitle" => "Read Time"));
         register_setting('word_count_plugin', 'wcp_readtime', array('sanitize_callback' => 'sanitize_text_field', 'default' => '1'));
-    }
-
-    function adminPage(){
-        add_options_page("Word Count Settings", "Word Count", "manage_options", "word-count-settings-page", array($this, "ourHTML"));
     }
 
     function ourHTML(){ ?>
@@ -74,6 +75,37 @@ class WordCountAndTimePlugin {
     function checkboxHTML($args){ ?>
 	<input type="checkbox" name="<?php echo $args['theId'] ?>" value="1" <?php checked(get_option($args['theId']), '1') ?>>
     <?php
+    }
+
+    function ifWrap($content){
+        if(is_main_query() AND is_single() AND
+            (get_option('wcp_wordcount', '1') OR
+            get_option('wcp_charcount', '1') OR
+            get_option('wcp_readtime', '1')
+        )){ return $this->createHTML($content); }
+        return $content;
+    }
+
+    function createHTML($content){
+        $html = "<h3>". esc_html(get_option('wcp_headline', 'Post Statistics'))."</h3><p>";
+        /*
+            get word count once because both wordcount and read time will need it.
+        */
+        if(get_option('wcp_wordcount', '1') == '1' OR get_option('wcp_readtime', '1') == '1')
+            $wordCount = str_word_count(strip_tags($content));
+        if(get_option('wcp_wordcount', '1') == '1')
+            $html .= '<p>' . "This post has " . $wordCount . " words.<br/>";
+        if(get_option('wcp_charcount', '1') == '1') {
+            $charCount = mb_strlen(strip_tags($content));
+            $html .= "This post has " . $charCount . " characters.<br/>";
+        }
+        if(get_option('wcp_readtime', '1') == '1'){
+            $html .= "This post will take about " . round($wordCount/255, 1) . " minute(s) to read.</br>";
+        }
+        $html .= '</p>';
+        if(get_option('wcp_location', '0') == 0)
+            return $html . $content;
+        return $content . $html;
     }
 }
 
