@@ -13,6 +13,9 @@ if(! defined('ABSPATH')) exit(); /* Exit if accessed directly */
 class OurWordFilterPlugin {
     function __construct(){
         add_action('admin_menu', array($this, 'ourMenu'));
+        add_action('admin_init', array($this, 'ourSettings'));
+        if(get_option('plugin_words_to_filter'))
+            add_filter('the_content', array($this, 'filterLogic'));
     }
 
     function ourMenu(){
@@ -39,9 +42,21 @@ class OurWordFilterPlugin {
     }
     
     function optionsSubPage(){ ?>
-        <p>Options</p>
+        <div class="wrap">
+            <h1>Word Filter Options</h1>
+            <form action="options.php" method="POST">
+                <?php
+                settings_errors();
+                settings_fields('replacementFields');
+                do_settings_sections('word-filter-options');
+                submit_button()
+                ?>
+            </form>
+        </div>
     <?php
     }
+
+    function mainPageAssets(){ wp_enqueue_style('filter-admin-css', plugin_dir_url(__FILE__).'styles.css', array()); }
 
     function handleForm(){
         if(array_key_exists('ourNonce', $_POST) AND wp_verify_nonce($_POST['ourNonce'], 'saveFilterWords') AND current_user_can("manage_options")){
@@ -54,7 +69,23 @@ class OurWordFilterPlugin {
         }
     }
 
-    function mainPageAssets(){ wp_enqueue_style('filter-admin-css', plugin_dir_url(__FILE__).'styles.css', array()); }
+    function ourSettings(){
+        add_settings_section('replacement-text-section', null, array(), 'word-filter-options');
+        register_setting('replacementFields', 'replacement-Text');
+        add_settings_field('replacement-Text', 'Filtered Text', array($this, 'replacementTextHTML'), 'word-filter-options', 'replacement-text-section', array());
+    }
+
+    function filterLogic($content){
+        $badWords = explode(',', get_option('plugin_words_to_filter'));
+        $badWordsTrimmed = array_map('trim', $badWords);
+        return str_ireplace($badWordsTrimmed, esc_html(get_option('replacement-Text', "****")), $content);
+    }
+
+    function replacementTextHTML(){ ?>
+        <input type="text" name="replacement-Text" value="<?php echo esc_attr(get_option("replacement-Text", "****")) ?>">
+        <p class="description">Leave blank to simply remove the filtered words.</p>
+    <?php
+    }
 
 }
 
