@@ -117,7 +117,25 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-console.info("It's from our new JS file");
+
+// console.info("It's from our JS file")
+
+(function () {
+  let locked = false;
+  wp.data.subscribe(function () {
+    const results = wp.data.select("core/block-editor").getBlocks().filter(function (block) {
+      return block.name == "ourplugin/our-paying-attention" && block.attributes.correctAnswer == undefined;
+    });
+    if (results.length && locked == false) {
+      locked = true;
+      wp.data.dispatch("core/editor").lockPostSaving("noanswer");
+    }
+    if (!results.length && locked) {
+      locked = false;
+      wp.data.dispatch("core/editor").unlockPostSaving("noanswer");
+    }
+  });
+})();
 wp.blocks.registerBlockType("ourplugin/our-paying-attention", {
   title: "Are You Paying Attention?",
   icon: "smiley",
@@ -128,7 +146,11 @@ wp.blocks.registerBlockType("ourplugin/our-paying-attention", {
     },
     answers: {
       type: "array",
-      default: ["red", "blue", "green"]
+      default: [""]
+    },
+    correctAnswer: {
+      type: "number",
+      default: undefined
     }
   },
   edit: EditComponent,
@@ -148,6 +170,16 @@ function EditComponent(props) {
     });
     props.setAttributes({
       answers: newAnswers
+    });
+    if (indexToDelete == props.attributes.correctAnswer) {
+      props.setAttributes({
+        correctAnswer: undefined
+      });
+    }
+  }
+  function markAsCorrect(index) {
+    props.setAttributes({
+      correctAnswer: index
     });
   }
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
@@ -173,10 +205,13 @@ function EditComponent(props) {
         props.setAttributes({
           answers: newAnswers
         });
-      }
-    })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.FlexItem, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Icon, {
+      },
+      autoFocus: answer == undefined
+    })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.FlexItem, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+      onClick: () => markAsCorrect(index)
+    }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Icon, {
       className: "mark-as-correct",
-      icon: "star-empty"
+      icon: props.attributes.correctAnswer == index ? "star-filled" : "star-empty"
     }))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.FlexItem, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
       className: "attention-delete",
       onClick: () => deleteAnswer(index)
@@ -188,7 +223,7 @@ function EditComponent(props) {
         answers: props.attributes.answers.concat([""])
       });
     }
-  }, "Add another answer"));
+  }, "Add Another Answer"));
 }
 })();
 
