@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Featured Professor Block Type\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-21 19:18+0000\n"
+"PO-Revision-Date: 2023-11-21 19:23+0000\n"
+"Last-Translator: demo account\n"
+"Language-Team: Spanish (Spain)\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.6; wp-6.4.1\n"
+"X-Domain: featured-professor"
+
+#. Name of the plugin
+msgid "Featured Professor Block Type"
+msgstr ""
+
+#. Author of the plugin
+msgid "ga1robe"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "http://kreatywne-media.pl/graphics_training/"
+msgstr ""
+
+#: src/index.js:46 build/index.js:199
+msgid "Select a professor"
+msgstr ""
