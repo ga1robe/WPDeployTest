@@ -1,3 +1,10 @@
+.our-placeholder-block {
+  padding: 20px;
+  text-align: center;
+  font-size: 1.65rem;
+  background: linear-gradient(180deg, #dedede, #adadad);
+}
+
 .remove-favorite {
   display: inline-block;
   transition: all 0.3s;
@@ -274,13 +281,27 @@
   opacity: 1;
 }
 
-/* Like Box */
-.generic-content, .like-box {
-  float: right;
+/* Generic-content Box */
+.generic-content {
+  float: initial; // : right, left are warring values
   font-size: 1rem;
   background-color: #ededed;
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
-  color: red;
+  color: black;
+  padding: 10px 10px 10px 25px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 0 30px 30px;
+  position: relative;
+}
+
+/* Like Box */
+.like-box {
+  float: right; // : right, left are warring values
+  font-size: 1rem;
+  background-color: #ededed;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+  color: darkred;
   padding: 10px 10px 10px 25px;
   border-radius: 4px;
   cursor: pointer;

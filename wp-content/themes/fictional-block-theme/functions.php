@@ -161,18 +161,90 @@ function ingoreCertainFiles($exclude_filters){
 
 add_filter('ai1m_exclude_content_from_export', 'ingoreCertainFiles');
 
-class JSXBlock{
+class JSXBlock {
+    var $renderCallback;
     var $name;
-    function __construct($name){
+    var $data;
+    function __construct($name, $renderCallback = null, $data = null) {
         $this->name = $name;
-        add_action("init", array($this, "onInit"));
+        $this->renderCallback = $renderCallback;
+        $this->data = $data;
+        add_action('init', array($this, 'onInit'));
     }
-    function onInit(){
-        wp_register_script($this->name, get_stylesheet_directory_uri()."/build/{$this->name}.js", array("wp-blocks", "wp-editor"));
-        register_block_type("our-block-theme/".$this->name, array( "editor_script" => $this->name ));
+    function onInit() {
+        wp_register_script($this->name, get_stylesheet_directory_uri() . "/build/{$this->name}.js", array('wp-blocks', 'wp-editor'));
+        if($this->data)
+            wp_localize_script($this->name, $this->name, $this->data);
+        $ourArgs = array( 'editor_script' => $this->name );
+        if ($this->renderCallback)
+            $ourArgs['render_callback'] = array($this, 'ourRenderCallback');
+        register_block_type("our-block-theme/{$this->name}", $ourArgs);
+    }
+    function ourRenderCallback($attributes, $content) {
+        ob_start();
+        require get_theme_file_path("/our-blocks/{$this->name}.php");
+        return ob_get_clean();
     }
 }
 
-new JSXBlock("banner");
+new JSXBlock("banner", true, array( "fallbackimage" => get_theme_file_uri("/image/library-hero.jpg") ));
 new JSXBlock("generic-heading");
+new JSXBlock("generic-button");
+new JSXBlock('slide-show', true);
+new JSXBlock('slide', true, array( "themeimagepath" => get_theme_file_uri("/images/") ));
+
+class PlaceholderBlock {
+    var $name;
+    function __construct($name){
+        $this->name = $name;
+        add_action("init", array($this, 'onInit'));
+    }
+    function onInit(){
+        wp_register_script($this->name, get_stylesheet_directory_uri()."/our-blocks/{$this->name}.js", array('wp-blocks', 'wp-editor'));
+        register_block_type("our-block-theme/{$this->name}", array( "editor_script" => $this->name, "render_callback" => array($this, "ourRenderCallback") ));
+    }
+
+     function ourRenderCallback($attributes, $content){
+        ob_start();
+        require get_theme_file_path("/our-blocks/{$this->name}.php");
+        return ob_get_clean();
+    }
+}
+
+new PlaceholderBlock("events-and-blogs");
+new PlaceholderBlock("header");
+new PlaceholderBlock("footer");
+new PlaceholderBlock("single-post");
+new PlaceholderBlock("page");
+new PlaceholderBlock("blog-index");
+new PlaceholderBlock("archive-program");
+new PlaceholderBlock("single-program");
+new PlaceholderBlock("single-professor");
+new PlaceholderBlock("page-my-notes");
+new PlaceholderBlock("archive-campus");
+new PlaceholderBlock("single-campus");
+new PlaceholderBlock("archive-event");
+new PlaceholderBlock("past-events");
+new PlaceholderBlock("single-event");
+new PlaceholderBlock("archive");
+new PlaceholderBlock("search");
+new PlaceholderBlock("search-results");
+
+function ourAllowedBlocks($allowed_block_types, $editor_context){
+    // if(!empty($editor_context->post->post_type == 'event'))
+    //     return array('core/paragraph', 'core/list'); // for examples…
+    /*
+    * If you are on a page/post editor screen
+    */
+    if(!empty($editor_context->post))
+        return $allowed_block_types;
+    /*
+    * If you are on the FSE sceen
+    */
+    return array('ourblocktheme/header', 'ourblocktheme/footer'); // for example…
+}
+/*
+* Uncomment the line bellow if you actually wamt to restrict which block types are allowed
+*/
+// add_filter('allowed_block_types_all', 'ourAllowedBlocks', 10, 2);
 ?>
