@@ -16,6 +16,9 @@ if(! have_posts()){
             if(! array_key_exists('subtitle', $args))
                 $args['subtitle'] = get_field('page_banner_subtitle');
             pageBanner($args);
+
+            if (array_key_exists('title', $args) && (strcmp(sanitize_title($args['title']),"search")==0) && ($the_query->posts[0]==99))
+                get_template_part("template-parts/content", "block-search-form");
             get_template_part("template-parts/content", "block-page");
         }
     }
@@ -24,6 +27,8 @@ else {
     while(have_posts()) {
         the_post();
         pageBanner();
+        if (array_key_exists('title', $args) && (strcmp(sanitize_title($args['title']),"search")==0)."&".($the_query->posts[0]==99))
+            get_template_part("template-parts/content", "block-search-form");
         get_template_part("template-parts/content", "block-page");
     }
 }
