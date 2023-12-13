@@ -36,4 +36,27 @@ if ($theParent or $testArray) { ?>
             <input class="search-submit" type="submit" value="Search">
         </div>
     </form>
+    <?php
+    $showQueryVars = false;
+    /*
+    * add to file: functions.php
+        function themeSlugQueryVars($vars){ $vars[] = 'SkyColor'; $vars[] = 'grassColor'; return $vars; }
+        add_filter('query_vars', 'themeSlugQueryVars');
+    * and change variable to positive: $showQueryVars = true;
+    * after refreshing page, enter the data and confirm…
+    * and expect the result in URI address after question mark
+    */
+    if($showQueryVars){
+        echo "<hr />";
+        $skyColorValue = sanitize_text_field(get_query_var('skyColor', $_GET['skyColor']));
+        $grassColorValue = sanitize_text_field(get_query_var('grassColor', $_GET['grassColor']));
+        if($skyColorValue == 'blue' && $grassColorValue == 'green'){ echo "<p>Sky is ".$_GET['skyColor'].", grass is ".$_GET['grassColor'].".</p>"; }
+        ?>
+        <form method="GET">
+            <input name="skyColor" placeholder="sky Color" />
+            <input name="grassColor" placeholder="grass Color" />
+            <button>Submit</button>
+        </form>
+        <?php
+    } ?>
 </div>

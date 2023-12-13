@@ -1,4 +1,6 @@
 <?php
+function themeSlugQueryVars($vars){ $vars[] = 'SkyColor'; $vars[] = 'grassColor'; return $vars; }
+add_filter('query_vars', 'themeSlugQueryVars');
 
 require get_theme_file_path('/inc/search-route.php');
 require get_theme_file_path('/inc/like-route.php');
